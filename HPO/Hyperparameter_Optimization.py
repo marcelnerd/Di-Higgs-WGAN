@@ -1,5 +1,6 @@
 import math
 import random
+import process_output_HPO   # check that I did this correctly
 
 num_inputs = 25
 
@@ -27,7 +28,7 @@ for s in [s_max - i for i in range(s_max + 1)]:
         print("i: " + str(i))
         n_i = math.floor(n * eta**(-1 * i))
         r_i = r * eta**i
-        metrics = [run_then_return_metric(t, r_i) for t in T]
+        metrics = [run_then_return_metric(t, r_i, i) for t in T]
         T, metrics = top_k_performers(T, metrics, math.floor(n_i / eta))
     top_performer = top_k_performers(T, metric, 1)
     top_performers.append((top_performer[0][0], top_performer[1][0]))
@@ -52,3 +53,14 @@ def get_hyperparameter_configurations(num_configs, s):
         for i in range(s):
             configs.append(config_string + '_iteration_' + str(i))
     return configs
+
+def run_then_return_metric(config, r_i, run_num):
+    # put
+    # stuff
+    # here
+    # to run
+    return Process_output_and_metric(testdir = config, run_number = run_num) 
+    
+    
+    
+    
