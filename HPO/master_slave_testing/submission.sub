@@ -1,0 +1,20 @@
+#!/bin/bash
+# FILENAME:  mysubmissionfile.sub
+while getopts i: flag
+do
+    case "${flag}" in 
+	i) number=${OPTARG};;
+    esac
+done
+module load cuda
+module load cudnn
+module load anaconda/5.1.0-py36
+
+source activate GANS_7
+
+host=`hostname -s`
+
+echo $CUDA_VISIBLE_DEVICES
+sleep 5
+# Run on the first available GPU
+python ./this_job.py --num $number
