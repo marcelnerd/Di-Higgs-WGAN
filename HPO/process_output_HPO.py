@@ -19,26 +19,28 @@ import ROOT
 from dihiggs_dataset import DiHiggsSignalMCDataset
 from ROOT import TH1F, TCanvas, TGraph, TLorentzVector
     
-def process_output_and_metric(self, mcdir = '/home/aj/CMS_Research/HH_4b/13TeV_Data/MC', configDir):
 
-    PT_INDEX = 0 # index of transverse momentum in event data
-    ETA_INDEX = 1 # index of pseudorapidity in event data
-    PHI_INDEX = 2 # index of phi in event data
-    MASS_INDEX = 3 # index of mass in event data
-    BTAG_INDEX = 4 # index of b-tag score in event data
-    FEATURES_PER_JET = 5
-    JETS_PER_EVENT = 5
+PT_INDEX = 0 # index of transverse momentum in event data
+ETA_INDEX = 1 # index of pseudorapidity in event data
+PHI_INDEX = 2 # index of phi in event data
+MASS_INDEX = 3 # index of mass in event data
+BTAG_INDEX = 4 # index of b-tag score in event data
+FEATURES_PER_JET = 5
+JETS_PER_EVENT = 5
 
-    # Below lists are used for plotting purposes
-    FEATURE_NAME_LIST = ['pts', 'etas', 'phis', 'masses', 'btags']
-    MOMENTUMS = ['pxs', 'pys', 'pzs']
-    DELTA_RS = ['dr12', 'dr13', 'dr14', 'dr15', 'dr23', 'dr24', 'dr25', 'dr34', 'dr35', 'dr45']
-    DELTA_R_HIGGS = ['dr12']
-    HIGGS_FEATURES = [['lead_pts', 'lead_masses'], ['subl_pts', 'subl_masses'], ['dihiggs_etas', 'dihiggs_masses']]
+# Below lists are used for plotting purposes
+FEATURE_NAME_LIST = ['pts', 'etas', 'phis', 'masses', 'btags']
+MOMENTUMS = ['pxs', 'pys', 'pzs']
+DELTA_RS = ['dr12', 'dr13', 'dr14', 'dr15', 'dr23', 'dr24', 'dr25', 'dr34', 'dr35', 'dr45']
+DELTA_R_HIGGS = ['dr12']
+HIGGS_FEATURES = [['lead_pts', 'lead_masses'], ['subl_pts', 'subl_masses'], ['dihiggs_etas', 'dihiggs_masses']]
+
+def process_output_and_metric(configDir, mcdir = '/depot/darkmatter/apps/awildrid/data'):
+
 
     #is_plotting = args.plot
     #plotting_epochs = args.epochs
-    test_path = testdir
+    test_path = configDir
     mc_path = mcdir
     # print("Plotting: " + str(is_plotting))
     # print("The epochs to plot: " + str(plotting_epochs))
@@ -199,6 +201,7 @@ def process_output_and_metric(self, mcdir = '/home/aj/CMS_Research/HH_4b/13TeV_D
     btags_metric = btags_ks_length # + btags_ks_weighted_slope
    # \n",
     WGAN_metric = pts_metric * etas_metric * phis_metric * masses_metric * btags_metric
+    os.system("echo " + str(WGAN_metric) " >> metric.txt")
     return(WGAN_metric)
 
 
@@ -375,6 +378,4 @@ def reconstruct_higgs(all_pts, all_etas, all_phis, all_masses, all_btags):
         dihiggs_list[i] = dihiggses
         delta_r_higgs_list[i] = delta_r_higgs
     return lead_higgs_list, subl_higgs_list, dihiggs_list, delta_r_higgs_list
-
-
 

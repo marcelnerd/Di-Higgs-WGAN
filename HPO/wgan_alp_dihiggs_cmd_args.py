@@ -26,6 +26,7 @@ import torch.autograd as autograd
 import torch
 
 from IPython import display
+import logging
 from matplotlib import pyplot as plt
 
 #
@@ -184,9 +185,6 @@ print('done')
 
 # In[5]:
 
-get_ipython().magic('tb')
-
-
 # In[4]:
 
 def compute_ALP(D, real_samples, fake_samples):   # TODO: Find out why these are .data
@@ -343,4 +341,6 @@ for epoch in range(opt.n_epochs):   # Loop through all epochs
 
 torch.save(generator.model, opt.configDir + "/generatorModel.pt")
 torch.save(discriminator.model, opt.configDir + "/discriminatorModel.pt")
+
+process_output_and_metric(opt.configDir)
 
