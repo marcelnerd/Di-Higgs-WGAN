@@ -12,6 +12,7 @@ import os
 import numpy as np
 import math
 import sys
+from collections import OrderedDict
 
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
@@ -24,13 +25,16 @@ import torch.nn as nn
 import torch.nn.functional as F   # NOTE: I don't think this is used
 import torch.autograd as autograd
 import torch
+from torch import Tensor
 
 from IPython import display
 import logging
 from matplotlib import pyplot as plt
 
+import process_output_HPO
+
 #
-print(torch.cuda.is_available())
+print('CUDA is available: ' + str(torch.cuda.is_available()))
 
 
 # In[6]:
@@ -98,13 +102,13 @@ class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()   
 
-        def block(in_feat, out_feat, normalize=True):   # This function creates the hidden layers
+        def block(in_feat, out_feat, alpha=0.2, normalize=True):   # This function creates the hidden layers
             layers = [nn.Linear(in_feat, out_feat)]   # layer is a hidden layer. Takes input
                                                       # (batch_size,in_feat) and give an output (batch_size,out_feat)
             if normalize:
                 layers.append(nn.BatchNorm1d(out_feat, 0.8))   # adds normalization to what Layers does to input and comes out in
                                                                # size (batch_size,out_feat). I think this does bn1d(linear(input))
-            layers.append(nn.LeakyReLU(0.2, inplace=True))   # inplace means just modify input, don't allocate more memory
+            layers.append(nn.LeakyReLU(alpha, inplace=True))   # inplace means just modify input, don't allocate more memory
             return layers
 
 
@@ -115,14 +119,17 @@ class Generator(nn.Module):
         if os.path.exists(opt.configDir + "/generatorModel.pt"): 
             self.model = torch.load(opt.configDir + "/generatorModel.pt")
         else:
-            self.model = nn.Sequential(   
-                *block(opt.latent_dim, 128, normalize=False),   # first layer
-                *block(128, 256),   # second layer
-                *block(256, 512),   # 3rd layer
-                *block(512, 1024),   # 4th layer
-                nn.Linear(1024, 25),   # final layer. Output is size 25
-                nn.Tanh()   # Using tanh for final output (why tanh vs leaky relu?)
-            )
+            layers = OrderedDict()
+            for i in range(opt.depth):
+                if i == 0:
+                    layers['layer_' + str(i)] = block(opt.latent_dim, opt.width, alpha=opt.alpha, normalize=opt.batch_norm)
+                elif i == opt.depth - 1:
+                    layers['layer_' + str(i)] = nn.Linear(opt.width, 25)
+                    layers['tanh'] = nn.Tanh()
+                else:
+                    layers['layer_' + str(i)] = block(opt.width, opt.width, alpha=opt.alpha, normalize=opt.batch_norm)
+                
+            self.model = nn.Sequential(layers)
 
     def forward(self, z):
         """
@@ -140,17 +147,29 @@ class Discriminator(nn.Module):
     def __init__(self):
         super(Discriminator, self).__init__()   # Just uses the module constructor with name Discriminator 
 
+        def block(in_feat, out_feat, alpha=0.2, normalize=True):   # This function creates the hidden layers
+            layers = [nn.Linear(in_feat, out_feat)]   # layer is a hidden layer. Takes input
+                                                      # (batch_size,in_feat) and give an output (batch_size,out_feat)
+            if normalize:
+                layers.append(nn.BatchNorm1d(out_feat, 0.8))   # adds normalization to what Layers does to input and comes out in
+                                                               # size (batch_size,out_feat). I think this does bn1d(linear(input))
+            layers.append(nn.LeakyReLU(alpha, inplace=True))   # inplace means just modify input, don't allocate more memory
+            return layers
+
         if os.path.exists(opt.configDir + "/discriminatorModel.pt"): 
             self.model = torch.load(opt.configDir + "/discriminatorModel.pt")
         else:
-            self.model = nn.Sequential(
-                nn.Linear(25, 512),   # first layer
-                nn.LeakyReLU(0.2, inplace=True),   # apply leaky relu to layer
-                nn.Linear(512, 256),   # 2nd layer
-                nn.LeakyReLU(0.2, inplace=True),   # apply leaky relu to layer
-                nn.Linear(256, 1),   # Final layer to give output. Output is size 1 (validity score)
-                                     # NOTE: weird to end with comma
-            )
+            layers = OrderedDict()
+            for i in range(opt.depth):
+                if i == 0:
+                    layers['layer_' + str(i)] = block(25, opt.width, alpha=opt.alpha, normalize=False)
+                elif i == opt.depth - 1:
+                    layers['layer_' + str(i)] = nn.Linear(opt.width, 1)
+                else:
+                    layers['layer_' + str(i)] = block(opt.width, opt.width, alpha=opt.alpha, normalize=False)
+                
+
+            self.model = nn.Sequential(layers)
 
     def forward(self, img):
         """
@@ -255,6 +274,14 @@ def compute_ALP(D, real_samples, fake_samples):   # TODO: Find out why these are
     
     return alp_penalty
 
+optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))   
+optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
+
+Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
+
+# Create learning rate decay schedulers
+my_lr_scheduler_G = torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer_G, gamma=opt.lrDecayRate)
+my_lr_scheduler_D = torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer_D, gamma=opt.lrDecayRate)
 
 # In[ ]:
 
@@ -295,7 +322,7 @@ for epoch in range(opt.n_epochs):   # Loop through all epochs
         # TODO: figure out why .data is used
 
         # Calculate loss for critic (Adversarial loss)
-        d_loss = -torch.mean(real_validity) + torch.mean(fake_validity) + opt.lambda_alp * alp
+        d_loss = torch.mean(real_validity) + torch.mean(fake_validity) + opt.lambda_alp * alp
 
         d_loss.backward()   # Do back propagation 
         optimizer_D.step()   # Update parameters based on gradients for individuals
@@ -334,6 +361,11 @@ for epoch in range(opt.n_epochs):   # Loop through all epochs
                 save_image(fake_imgs.data[:25], "images/%d.png" % batches_done, nrow=5, normalize=True)
 
             batches_done += n_critic
+
+    # Call learning rate decays every epoch
+    my_lr_scheduler_D.step()
+    my_lr_scheduler_G.step()
+
     if epoch % 10 == 0:
         z = Variable(Tensor(np.random.normal(0, 1, (300000, opt.latent_dim))))
         fake_data = generator(z)

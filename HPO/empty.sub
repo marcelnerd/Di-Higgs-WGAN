@@ -1,11 +1,11 @@
 #!/bin/bash
 # FILENAME:  mysubmissionfile.sub
 
-module load anaconda/5.1.0-py36
+module load anaconda/5.1.0-py27
 module load use.own
-module load conda-env/gan_utils-py3.6.4
-module load learning/conda-5.1.0-py36-gpu
-module load ml-toolkit-gpu/pytorch/1.4.0
+module load conda-env/gan_utils-py2.7.14
+module load learning/conda-5.1.0-py27-gpu
+module load ml-toolkit-gpu/pytorch/1.0.0
 source /cvmfs/sft.cern.ch/lcg/views/LCG_96/x86_64-centos7-gcc8-opt/setup.sh
 
 host=`hostname -s`

@@ -176,11 +176,19 @@ def process_output_and_metric(configDir, mcdir = '/depot/darkmatter/apps/awildri
     index = len(pts_ks_values) - ten_percent
     # slope_scaling = 0.5
 
-    pts_ks_length = np.mean(pts_ks_values[int(index):])
-    etas_ks_length = np.mean(etas_ks_values[int(index):])
-    phis_ks_length = np.mean(phis_ks_values[int(index):])
-    masses_ks_length = np.mean(masses_ks_values[int(index):])
-    btags_ks_length = np.mean(btags_ks_values[int(index):])
+    # pts_ks_length = np.mean(pts_ks_values[int(index):])
+    # etas_ks_length = np.mean(etas_ks_values[int(index):])
+    # phis_ks_length = np.mean(phis_ks_values[int(index):])
+    # masses_ks_length = np.mean(masses_ks_values[int(index):])
+    # btags_ks_length = np.mean(btags_ks_values[int(index):])
+
+    higgs_dr_ks_length = np.mean(higgs_dr_ks_values[int(index):])
+    higgs_lead_m_ks_length = np.mean(higgs_lead_m_ks_values[int(index):])
+    higgs_subl_m_ks_length = np.mean(higgs_subl_m_ks_values[int(index):])
+    higgs_lead_pt_ks_length = np.mean(higgs_lead_pt_ks_values[int(index):])
+    higgs_subl_pt_ks_length = np.mean(higgs_subl_pt_ks_values[int(index):])
+    dihiggs_m_ks_length = np.mean(dihiggs_m_ks_values[int(index):])
+    dihiggs_eta_ks_length = np.mean(dihiggs_eta_ks_values[int(index):])
 
     # pts_ks_linear_data = stats.linregress(list(range(1,int(ten_percent+1))), pts_ks_values[int(index):])
     # etas_ks_linear_data = stats.linregress(list(range(1,int(ten_percent+1))), etas_ks_values[int(index):])
@@ -199,9 +207,19 @@ def process_output_and_metric(configDir, mcdir = '/depot/darkmatter/apps/awildri
     phis_metric = phis_ks_length # + phis_ks_weighted_slope
     masses_metric = masses_ks_length # + masses_ks_weighted_slope
     btags_metric = btags_ks_length # + btags_ks_weighted_slope
+
+    higgs_dr_metric = higgs_dr_ks_length # + pts_ks_weighted_slope
+    higgs_lead_m_metric = higgs_lead_m_ks_length # + etas_ks_weighted_slope
+    higgs_subl_m_metric = higgs_subl_m_ks_length # + phis_ks_weighted_slope
+    higgs_lead_pt_metric = higgs_lead_pt_ks_length # + masses_ks_weighted_slope
+    higgs_subl_pt_metric = higgs_subl_pt_ks_length # + btags_ks_weighted_slope
+    dihiggs_m_metric = dihiggs_m_ks_length # + masses_ks_weighted_slope
+    dihiggs_eta_metric = dihiggs_eta_ks_length # + btags_ks_weighted_slope
+
    # \n",
-    WGAN_metric = pts_metric * etas_metric * phis_metric * masses_metric * btags_metric
-    os.system("echo " + str(WGAN_metric) " >> metric.txt")
+    #WGAN_metric = pts_metric * etas_metric * phis_metric * masses_metric * btags_metric
+    WGAN_metric = higgs_dr_metric * higgs_lead_m_metric * higgs_subl_m_metric * higgs_lead_pt_metric * higgs_subl_pt_metric * dihiggs_m_metric * dihiggs_eta_metric
+    os.system("echo " + str(WGAN_metric) + " >> metric.txt")
     return(WGAN_metric)
 
 
