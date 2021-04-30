@@ -35,44 +35,44 @@ def run_then_return_metric(config, r_i, run_num):
 
 def top_k_performers(T, metrics, k):
     metrics, T = heapSort(metrics, T)
-​
+
     return T[:k], metrics[:k]
-​
+
 # heapSort() helper function
 def heapify(metrics, T, n, root):
     largest = root
     left = 2 * root + 1
     right = 2 * root + 2
-​
+
     # Check if metric[left] exists and is greater than root
     if left < n and metrics[root] < metrics[left]:
         largest = left
-​
+
     # Check if metric[right] exists and is greater than root
     if right < n and metrics[largest] < metrics[right]:
         largest = right
-​
+
     # Change root
     if largest != root:
         metrics[root], metrics[largest] = metrics[largest], metrics[root]
         T[root], T[largest] = T[largest], T[root]
         heapify(metrics, T, n, largest)
-​
+
 # Time = nlog(n)
 # Space = 1
 def heapSort(metrics, T):
     n = len(metrics)
-​
+
     # Build max heap
     for i in range(n // 2 - 1, -1, -1):
         heapify(metrics, T, n, i)
-​
+
     # swap first and last index, heapify!!
     for i in range(n-1, 0, -1):
         metrics[i], metrics[0] = metrics[0], metrics[i]
         T[i], T[0] = T[0], T[i]
         heapify(metrics, T, i, 0)
-​
+
     return metrics, T
 
 
@@ -102,37 +102,9 @@ for s in [s_max - i for i in range(s_max + 1)]:
     r = R * eta**(-1 * s) # per bracket base runtime
     # begin successively halving our n configurations with drop rate eta for base runtime r
     T = get_hyperparameter_configurations(n, s)
-
-    for i in range(s):
-        ith_configs = [t for t in T if 'iteration_' + str(i) in t]
-        # make the directories
-        for directory in ith_configs:
-            os.system("mkdir " + directory)
-            try:
-                os.makedirs(os.path.join("./", directory))
-            except OSError:
-                logging.warning("Output folders already exist. May overwrite some output files.")*\
-
-        print("i: " + str(i))
-        n_i = int(math.floor(n * eta**(-1 * i)))
-        r_i = int(r * eta**i)
-        for t in ith_configs:
-            run_then_return_metric(t, r_i, i)
-
-        # create job ID list
-        jobIDs = ""
-        job_ID_file = open("output.txt","r") 
-        jobID = job_ID_file.readline()
-        count = 0
-        while line:
-            jobIDs += jobID.split(" ")[3].rstrip("\n")
-            if (count < 4 - 1):
-                jobIDs += ","
-                count += 1
-            jobID = job_ID_file.readline()
-
-        T, metrics = top_k_performers(ith_configs, metrics, math.floor(n_i / eta))
-        T = [t.replace('iteration_' + str(i), 'iteration_' + str(i + 1)) for t in T]
+    for (t in T):
+        os.system("echo " + t + " >> metric_" + str(s) + ".txt")
+    
     #top_performer = top_k_performers(T, metric, 1)
     #top_performers.append((top_performer[0][0], top_performer[1][0]))
 

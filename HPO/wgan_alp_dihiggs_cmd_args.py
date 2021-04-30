@@ -61,6 +61,7 @@ parser.add_argument("--configDir", type=str, help="Directory to save data to")
 opt = parser.parse_args()
 print(opt)
 
+
 class opt_old():   # Class used for optimizers in the future. Defines all variables and stuff needed.
     n_epochs = 20000   # an epoch is the number of times it works through the entire training set
     batch_size = 1000   # the training set is broken up into batches, 

@@ -27,7 +27,8 @@ num_epochs = num_run_file.readline()
     + " --latentSpaceSize " + args['latent_space_size'] \
     + " --batch_norm " + args['batch_norm'] \
     + " --beta1 " + args['beta1'] \
-    + " --beta2 " + args['beta2'])'''
+    + " --beta2 " + args['beta2'] \
+    + " --configDir + args['configDir'])'''
 
 metric = random.random()
 os.system('echo ' + str(metric) + ' >> metric.txt')
