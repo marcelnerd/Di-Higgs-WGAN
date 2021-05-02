@@ -1,0 +1,18 @@
+#!/bin/sh -l
+# FILENAME:  mysubmissionfile.sub
+
+module load anaconda/5.1.0-py27
+module load use.own
+module load conda-env/gan_utils-py2.7.14
+module load learning/conda-5.1.0-py27-gpu
+module load ml-toolkit-gpu/pytorch/1.0.0
+source /cvmfs/sft.cern.ch/lcg/views/LCG_96/x86_64-centos7-gcc8-opt/setup.sh
+
+current_dir = pwd
+host=`hostname -s`
+
+echo $CUDA_VISIBLE_DEVICES
+#echo My number is $number
+sleep 5
+# Run on the first available GPU
+python ./Hyperparameter_Optimization.py

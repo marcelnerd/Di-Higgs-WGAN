@@ -28,7 +28,7 @@ num_epochs = num_run_file.readline()
     + " --batch_norm " + args['batch_norm'] \
     + " --beta1 " + args['beta1'] \
     + " --beta2 " + args['beta2'] \
-    + " --configDir + args['configDir'])'''
+    + " --configDir + processed_dir)'''
 
 metric = random.random()
 os.system('echo ' + str(metric) + ' >> metric.txt')
