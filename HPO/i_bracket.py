@@ -14,6 +14,11 @@ def run_then_return_metric(config, r_i, run_num):
     os.system("rm run_num.txt")
     os.system("cd ../../../")
 
+def top_k_performers(T, metrics, k):
+    metrics, T = heapSort(metrics, T)
+
+    return T[:k], metrics[:k]
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--i", type=int, help="number of epochs of training")
@@ -95,4 +100,5 @@ while jobID:
         count += 1
     jobID = job_ID_file.readline()
 
-create dependancy job
+#create dependancy job
+os.system("sbatch -A scholar --nodes=1 --gpus=1 -t 0:05:00 --dependency=afterok:" + jobIDs + " ./recursive.sub")

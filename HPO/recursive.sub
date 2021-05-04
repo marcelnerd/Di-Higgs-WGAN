@@ -10,7 +10,5 @@ source /cvmfs/sft.cern.ch/lcg/views/LCG_96/x86_64-centos7-gcc8-opt/setup.sh
 
 host=`hostname -s`
 
-echo $CUDA_VISIBLE_DEVICES
-
 # Run on the first available GPU
-python Empty_job.py
+python i_brack.py # TODO Pass arguments

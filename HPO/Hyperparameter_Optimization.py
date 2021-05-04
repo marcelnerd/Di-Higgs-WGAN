@@ -28,10 +28,7 @@ def get_hyperparameter_configurations(num_configs, s):
         #    configs.append(config_string + '_iteration_' + str(i))
     return configs
 
-def top_k_performers(T, metrics, k):
-    metrics, T = heapSort(metrics, T)
 
-    return T[:k], metrics[:k]
 
 # heapSort() helper function
 def heapify(metrics, T, n, root):
@@ -98,16 +95,17 @@ for s in [s_max - i for i in range(s_max + 1)]:
     # begin successively halving our n configurations with drop rate eta for base runtime r
     T = get_hyperparameter_configurations(n, s)
 
-    #write T to file
+    # write T to file
     metric_file = open("metric_" + str(s) + "_" + str(i) + ".txt", "w")
     for t in T:
         metric_file.write(t + "\n")
     metric_file.close()
 
 
-    call job for i_bracket
-    
-    #top_performer = top_k_performers(T, metric, 1)
+    #call job for first i_bracket
+    os.system("python i_bracket.py") #TODO add arguements
+
+        #top_performer = top_k_performers(T, metric, 1)
     #top_performers.append((top_performer[0][0], top_performer[1][0]))
 
 
