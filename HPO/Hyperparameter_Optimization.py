@@ -5,6 +5,8 @@ import sys
 import os
 import logging
 
+# Finish recursive function, check i=0 submission and save works, parse job ids and test dependency job, sort metrics and find k-highest and submit new job, change directory in i_bracket file, double check correct sorting
+
 def get_hyperparameter_configurations(num_configs, s):
     configs = []
     for x in range(num_configs):
@@ -22,16 +24,9 @@ def get_hyperparameter_configurations(num_configs, s):
                 config_string += '_'
             elif type(hyperparameter_ranges[x][0]) is bool:
                 config_string += str(random.choice([True, False]))
-        for i in range(1):
-            configs.append(config_string + '_iteration_' + str(i))
+        #for i in range(1):
+        #    configs.append(config_string + '_iteration_' + str(i))
     return configs
-
-def run_then_return_metric(config, r_i, run_num):
-    os.system("cd " + config)
-    os.system("echo " + str(r_i) + " >> run_num.txt")
-    os.system("sbatch -A scholar --nodes=1 --gpus=1 -t 0:05:00 ./training_sub_file.sub >> ../output.txt")
-    os.system("rm run_num.txt")
-    os.system("cd ../../../")
 
 def top_k_performers(T, metrics, k):
     metrics, T = heapSort(metrics, T)
@@ -76,7 +71,7 @@ def heapSort(metrics, T):
     return metrics, T
 
 
-def recursion(s_max, i):
+def recursion(s, i):
     return 0
 
 
@@ -90,7 +85,7 @@ if(len(hyperparameters) != len(hyperparameter_ranges)):
     sys.exit()
 
 # inputs
-R = 27 # maximum number of batches a hyperparameter configuration will run for
+R = 3 #27 # maximum number of batches a hyperparameter configuration will run for
 eta = 3 # fraction of hyperparameter configuration will be kept (1 / eta), "drop rate"
 # initialization
 s_max = int(math.floor(math.log(R, eta))) # number of differensftp://awildrid@gilbreth.rcac.purdue.edu/depot/darkmatter/apps/awildrid/HPO/Hyperparameter_Optimization.pyt combinations of total number of configurations and drop rates
@@ -102,8 +97,15 @@ for s in [s_max - i for i in range(s_max + 1)]:
     r = R * eta**(-1 * s) # per bracket base runtime
     # begin successively halving our n configurations with drop rate eta for base runtime r
     T = get_hyperparameter_configurations(n, s)
-    for (t in T):
-        os.system("echo " + t + " >> metric_" + str(s) + ".txt")
+
+    #write T to file
+    metric_file = open("metric_" + str(s) + "_" + str(i) + ".txt", "w")
+    for t in T:
+        metric_file.write(t + "\n")
+    metric_file.close()
+
+
+    call job for i_bracket
     
     #top_performer = top_k_performers(T, metric, 1)
     #top_performers.append((top_performer[0][0], top_performer[1][0]))

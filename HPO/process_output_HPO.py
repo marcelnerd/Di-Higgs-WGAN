@@ -219,7 +219,7 @@ def process_output_and_metric(configDir, mcdir = '/depot/darkmatter/apps/awildri
    # \n",
     #WGAN_metric = pts_metric * etas_metric * phis_metric * masses_metric * btags_metric
     WGAN_metric = higgs_dr_metric * higgs_lead_m_metric * higgs_subl_m_metric * higgs_lead_pt_metric * higgs_subl_pt_metric * dihiggs_m_metric * dihiggs_eta_metric
-    os.system("echo " + str(WGAN_metric) + " " + configDir + " >> metric_" + str(s) + ".txt")
+    os.system("echo " + str(WGAN_metric) + " " + configDir + " >> metric_" + ".txt")
     
     return(WGAN_metric)
 
