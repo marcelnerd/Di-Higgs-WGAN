@@ -103,7 +103,9 @@ for s in [s_max - i for i in range(s_max + 1)]:
 
 
     #call job for first i_bracket
-    os.system("python i_bracket.py") #TODO add arguements
+    os.system("python i_bracket.py --i " + str(i) + " --s " + str(s) + " --n " + str(len(T)) + 
+              " --r " + str(r) + " --eta " + str(eta) + " --configFile " + "metric_" + str(s) + "_" + str(i) + ".txt") #TODO add arguements
+
 
         #top_performer = top_k_performers(T, metric, 1)
     #top_performers.append((top_performer[0][0], top_performer[1][0]))
