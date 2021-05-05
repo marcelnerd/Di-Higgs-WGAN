@@ -6,6 +6,7 @@ import sys
 import os
 import logging
 import Hyperparameter_Optimization
+import argparse
 
 def run_then_return_metric(config, r_i, run_num):
     os.system("cd " + config)
@@ -62,6 +63,7 @@ if i > 0: # Change this so it reads from the metric file in the right folder may
     temp = []
     #metric_file = open("metric_" + str(s) + "_" + str(i) + ".txt","r")
     for count in range(0, len(T)):
+        t = T[count]
         metric_file = open(t + "/metric_" + ".txt","r")
         file_stuff = metric_file.readline()
         metrics[count] = file_stuff.split(" ")[0]
