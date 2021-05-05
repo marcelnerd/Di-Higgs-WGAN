@@ -34,6 +34,19 @@ opt = parser.parse_args()
 i = opt.i
 s = opt.s
 configFileName = opt.configFile
+
+# read all configurations
+T = []
+config_file = open(configFileName, "r")
+file_stuff = config_file.readline()
+count = 0
+while file_stuff:
+    T[count] = file_stuff.rstrip("\n")
+    count += 1
+    file_stuff = config_file.readline()
+
+config_file.close()
+T = [t + "_i_" + i for t in T]
 # if i > 0:
 #     T = []
 #     metric_file = open("metric_" + str(s) + ".txt", "r")
@@ -46,31 +59,37 @@ configFileName = opt.configFile
     
 if i > 0: # Change this so it reads from the metric file in the right folder maybe?
     metrics = []
-    T = []
-    metric_file = open("metric_" + str(s) + "_" + str(i) + ".txt","r")
-    file_stuff = metric_file.readline()
-    count = 0
-    while file_stuff:
-        metrics[count] = file_stuff.split(" ")[0]
-        T[count] = file_stuff.split(" ")[1].rstrip("\n")
-        count += 1
+    temp = []
+    #metric_file = open("metric_" + str(s) + "_" + str(i) + ".txt","r")
+    for count in range(0, len(T)):
+        metric_file = open(t + "/metric_" + ".txt","r")
         file_stuff = metric_file.readline()
+        metrics[count] = file_stuff.split(" ")[0]
+        temp[count] = file_stuff.split(" ")[1].rstrip("\n")
+    #count = 0
+    #while file_stuff:
+     #   metrics[count] = file_stuff.split(" ")[0]
+      #  T[count] = file_stuff.split(" ")[1].rstrip("\n")
+       # count += 1
+        #file_stuff = metric_file.readline()
     metric_file.close()
+    
+    T = temp
 
     T, metrics = top_k_performers(T, metrics, math.floor(n_i / eta))
     T = [t.split("_i_", 1)[0] + "_i_" + str(i) for t in T] # Update the directory with the new i
-else:
-    T = []
-    config_file = open(configFileName, "r")
-    file_stuff = config_file.readline()
-    count = 0
-    while file_stuff:
-        T[count] = file_stuff.rstrip("\n")
-        count += 1
-        file_stuff = config_file.readline()
+#else:
+ #   T = []
+  #  config_file = open(configFileName, "r")
+   # file_stuff = config_file.readline()
+    #count = 0
+    #while file_stuff:
+     #   T[count] = file_stuff.rstrip("\n")
+      #  count += 1
+       # file_stuff = config_file.readline()
 
-    config_file.close()
-    T = [t + "_i_" + i for t in T]
+#    config_file.close()
+ #   T = [t + "_i_" + i for t in T]
 
 #ith_configs = [t for t in T if 'iteration_' + str(i) in t]
 # make the directories
